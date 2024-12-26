@@ -1,19 +1,30 @@
-use portable_atomic::AtomicI8;
+use alloc::collections::VecDeque;
 
-pub struct Sequencer {
-    pub(crate) current_position: AtomicI8,
-    pub(crate) current_tilt: Option<AtomicI8>,
-    pub(crate) target_position: AtomicI8,
-    pub(crate) target_tilt: Option<AtomicI8>,
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum Direction {
+    Extend,
+    Retract,
+    Hold,
 }
 
-pub trait ControllerInput {
-    fn set_target_position(&self, position: i8);
-    fn set_target_tilt(&self, tilt: i8);
-    fn interrupt(&self);
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct WindowDressingInstruction {
+    pub quality: Direction,
+    pub quantity: u32,
+    pub completed_state: WindowDressingState,
 }
 
-pub trait ControllerOutput {
-    fn next_position(&self) -> i8;
-    fn next_tilt(&self) -> i8;
+#[derive(Debug, Default, PartialEq)]
+pub struct WindowDressingSequencer {
+    pub full_cycle_quality: u32,
+    pub full_tilt_quality: Option<u32>,
+    pub desired_state: WindowDressingState,
+    pub current_state: WindowDressingState,
+    pub instructions: VecDeque<WindowDressingInstruction>,
+}
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct WindowDressingState {
+    pub position: u8,
+    pub tilt: i8,
 }
