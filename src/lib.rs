@@ -1,3 +1,5 @@
 #![no_std]
+
+mod imp;
 mod model;
-pub use model::controller::*;
+pub use model::sequencer::*;

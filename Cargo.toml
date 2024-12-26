@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 portable-atomic = "1"
+critical-section = "1"

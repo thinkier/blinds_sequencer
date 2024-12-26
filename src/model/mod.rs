@@ -1,1 +1,1 @@
-pub(crate) mod controller;
+pub(super) mod sequencer;
