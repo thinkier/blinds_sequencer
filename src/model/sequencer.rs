@@ -16,8 +16,8 @@ pub struct WindowDressingInstruction {
 
 #[derive(Debug, Default)]
 pub struct WindowDressingSequencer {
-    pub full_cycle_quality: u32,
-    pub full_tilt_quality: Option<u32>,
+    pub full_cycle_quantity: u32,
+    pub full_tilt_quantity: Option<u32>,
     pub desired_state: WindowDressingState,
     pub current_state: WindowDressingState,
     pub instructions: Deque<WindowDressingInstruction, 1024>,

@@ -125,6 +125,18 @@ fn open_partial_sequence() {
         );
     }
 
+    assert_eq!(
+        seq.get_next_instruction(),
+        Some(WindowDressingInstruction {
+            quality: Direction::Hold,
+            quantity: 500,
+            completed_state: WindowDressingState {
+                position: 75,
+                tilt: -90
+            },
+        })
+    );
+
     for i in -89..=60 {
         assert_eq!(
             seq.get_next_instruction(),
@@ -258,6 +270,18 @@ fn close_full_sequence() {
         );
     }
 
+    assert_eq!(
+        seq.get_next_instruction(),
+        Some(WindowDressingInstruction {
+            quality: Direction::Hold,
+            quantity: 500,
+            completed_state: WindowDressingState {
+                position: 0,
+                tilt: 90
+            },
+        })
+    );
+
     for i in -89..=90 {
         assert_eq!(
             seq.get_next_instruction(),
@@ -354,6 +378,18 @@ fn close_partial_sequence() {
             })
         );
     }
+
+    assert_eq!(
+        seq.get_next_instruction(),
+        Some(WindowDressingInstruction {
+            quality: Direction::Hold,
+            quantity: 500,
+            completed_state: WindowDressingState {
+                position: 25,
+                tilt: 90
+            },
+        })
+    );
 
     for i in -89..=90 {
         assert_eq!(

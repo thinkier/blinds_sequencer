@@ -8,17 +8,17 @@ mod tests;
 const HOLD_QUANTITY: u32 = 500;
 
 impl WindowDressingSequencer {
-    pub fn new_roller(full_cycle_quality: u32) -> Self {
+    pub fn new_roller(full_cycle_quantity: u32) -> Self {
         Self {
-            full_cycle_quality,
+            full_cycle_quantity,
             ..Default::default()
         }
     }
 
-    pub fn new_venetian(full_cycle_quality: u32, full_tilt_quality: u32) -> Self {
+    pub fn new_venetian(full_cycle_quantity: u32, full_tilt_quantity: u32) -> Self {
         Self {
-            full_cycle_quality,
-            full_tilt_quality: Some(full_tilt_quality),
+            full_cycle_quantity,
+            full_tilt_quantity: Some(full_tilt_quantity),
             ..Default::default()
         }
     }
@@ -30,11 +30,13 @@ impl WindowDressingSequencer {
 
             // If the instructions queue is empty & it's not commanded to hold, buffer a hold command
             if self.instructions.is_empty() && next.quality != Direction::Hold {
-                self.instructions.push_back(WindowDressingInstruction {
-                    quality: Direction::Hold,
-                    quantity: HOLD_QUANTITY,
-                    completed_state: self.current_state,
-                }).expect("The buffer should've been emptied if the hold is queued at the end");
+                self.instructions
+                    .push_back(WindowDressingInstruction {
+                        quality: Direction::Hold,
+                        quantity: HOLD_QUANTITY,
+                        completed_state: self.current_state,
+                    })
+                    .expect("The buffer should've been emptied if the hold is queued at the end");
             }
 
             Some(next)
@@ -57,7 +59,7 @@ impl WindowDressingSequencer {
 
         self.add_tilt(self.current_state.tilt, angle_while_moving);
         for percentage_change in 1..=absolute_change {
-            if self.full_tilt_quality.is_none() {
+            if self.full_tilt_quantity.is_none() {
                 angle_while_moving = 0;
             }
 
@@ -74,7 +76,7 @@ impl WindowDressingSequencer {
             // It's safe to eat the error because the state will not be corrupted
             let _ = self.instructions.push_back(WindowDressingInstruction {
                 quality,
-                quantity: self.full_cycle_quality / 100,
+                quantity: self.full_cycle_quantity / 100,
                 completed_state: WindowDressingState {
                     position,
                     tilt: angle_while_moving,
@@ -103,9 +105,10 @@ impl WindowDressingSequencer {
         if absolute_change == 0 {
             return;
         }
+        let tail = self.instructions.back();
         let position = self.get_tail_state().position;
 
-        if let Some(ref full_tilt_quality) = self.full_tilt_quality {
+        if let Some(ref full_tilt_quality) = self.full_tilt_quantity {
             self.desired_state.tilt = to_angle;
             let quality = if opening {
                 Direction::Retract
@@ -124,6 +127,17 @@ impl WindowDressingSequencer {
                     },
                 });
                 return;
+            }
+
+            if let Some(tail) = tail {
+                if tail.quality != quality {
+                    // It's safe to eat the error because the state will not be corrupted
+                    let _ = self.instructions.push_back(WindowDressingInstruction {
+                        quality: Direction::Hold,
+                        quantity: HOLD_QUANTITY,
+                        completed_state: tail.completed_state,
+                    });
+                }
             }
 
             for angle_change in 1..=absolute_change {
@@ -153,7 +167,7 @@ impl WindowDressingSequencer {
             self.current_state.position < self.desired_state.position
                 || self.current_state.position == 100
         };
-        let tilt = if self.full_tilt_quality.is_some() {
+        let tilt = if self.full_tilt_quantity.is_some() {
             if opening {
                 0
             } else {
