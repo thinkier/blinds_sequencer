@@ -45,6 +45,24 @@ impl WindowDressingSequencer {
         }
     }
 
+    /// Groups multiple instructions of a similar quality into a single instruction.
+    pub fn get_next_instruction_grouped(&mut self) -> Option<WindowDressingInstruction> {
+        if let Some(mut buf) = self.get_next_instruction() {
+            while let Some(next) = self.get_next_instruction() {
+                if buf.quality == next.quality {
+                    buf += &next;
+                } else {
+                    let _ = self.instructions.push_front(next);
+                    break;
+                }
+            }
+
+            Some(buf)
+        } else {
+            None
+        }
+    }
+
     /// Command from HAP to set the position of the window dressing.
     pub fn set_position(&mut self, opened: u8) {
         self.desired_state.position = opened;
