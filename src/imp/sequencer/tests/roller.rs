@@ -1,11 +1,11 @@
 use crate::model::sequencer::{
-    WindowDressingInstruction, WindowDressingSequencer, WindowDressingState,
+    WindowDressingInstruction, HaltingSequencer, WindowDressingState,
 };
-use crate::Direction;
+use crate::{Direction, WindowDressingSequencer};
 
 #[test]
 fn desired_state_updates() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.set_position(69);
     assert_eq!(
         seq.desired_state,
@@ -18,7 +18,7 @@ fn desired_state_updates() {
 
 #[test]
 fn current_state_updates() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 0;
     seq.set_position(69);
     for i in 1..=69 {
@@ -35,7 +35,7 @@ fn current_state_updates() {
 
 #[test]
 fn open_fully() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 0;
     seq.set_position(100);
 
@@ -68,7 +68,7 @@ fn open_fully() {
 
 #[test]
 fn open_partially() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 25;
     seq.set_position(75);
 
@@ -101,7 +101,7 @@ fn open_partially() {
 
 #[test]
 fn close_fully() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 100;
     seq.set_position(0);
 
@@ -135,7 +135,7 @@ fn close_fully() {
 
 #[test]
 fn close_partially() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 75;
     seq.set_position(25);
 
@@ -169,7 +169,7 @@ fn close_partially() {
 
 #[test]
 fn open_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 0;
     seq.set_position(100);
 
@@ -204,7 +204,7 @@ fn open_trig_endstop() {
 
 #[test]
 fn close_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 100;
     seq.set_position(0);
 

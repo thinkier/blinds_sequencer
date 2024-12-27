@@ -1,11 +1,11 @@
 use crate::model::sequencer::{
-    WindowDressingInstruction, WindowDressingSequencer, WindowDressingState,
+    WindowDressingInstruction, HaltingSequencer, WindowDressingState,
 };
-use crate::Direction;
+use crate::{Direction, WindowDressingSequencer};
 
 #[test]
 fn close_grouped() {
-    let mut seq = WindowDressingSequencer::new_roller(100_000);
+    let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 100;
     seq.set_position(0);
 

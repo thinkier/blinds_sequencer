@@ -1,18 +1,18 @@
 use crate::model::sequencer::{
-    WindowDressingInstruction, WindowDressingSequencer, WindowDressingState,
+    WindowDressingInstruction, HaltingSequencer, WindowDressingState,
 };
-use crate::Direction;
+use crate::{Direction, WindowDressingSequencer};
 
 #[test]
 fn desired_state_updates() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.set_tilt(69);
     assert_eq!(seq.desired_state.tilt, 69);
 }
 
 #[test]
 fn current_state_updates() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = 0;
     seq.set_tilt(69);
     for i in 1..=69 {
@@ -23,7 +23,7 @@ fn current_state_updates() {
 
 #[test]
 fn close_full() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = -90;
     seq.set_tilt(90);
     for i in -89..=90 {
@@ -55,7 +55,7 @@ fn close_full() {
 
 #[test]
 fn open_full() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = 90;
     seq.set_tilt(-90);
     for i in -89..=90 {
@@ -87,7 +87,7 @@ fn open_full() {
 
 #[test]
 fn close_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = -90;
     seq.set_tilt(90);
 
@@ -116,7 +116,7 @@ fn close_trig_endstop() {
 
 #[test]
 fn open_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = 90;
     seq.set_tilt(-90);
 

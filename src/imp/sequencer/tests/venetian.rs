@@ -1,11 +1,11 @@
 use crate::model::sequencer::{
-    WindowDressingInstruction, WindowDressingSequencer, WindowDressingState,
+    WindowDressingInstruction, HaltingSequencer, WindowDressingState,
 };
-use crate::Direction;
+use crate::{Direction, WindowDressingSequencer};
 
 #[test]
 fn open_full_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 0;
     seq.current_state.tilt = 90;
     seq.set_position(100);
@@ -55,7 +55,7 @@ fn open_full_sequence() {
 
 #[test]
 fn open_full_tiltless_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 0;
     seq.current_state.tilt = -90;
     seq.set_position(100);
@@ -90,7 +90,7 @@ fn open_full_tiltless_sequence() {
 
 #[test]
 fn open_partial_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 25;
     seq.current_state.tilt = 60;
     seq.set_position(75);
@@ -164,7 +164,7 @@ fn open_partial_sequence() {
 
 #[test]
 fn open_partial_tiltless_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 25;
     seq.current_state.tilt = -90;
     seq.set_position(75);
@@ -199,7 +199,7 @@ fn open_partial_tiltless_sequence() {
 
 #[test]
 fn open_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 0;
     seq.current_state.tilt = -90;
     seq.set_position(90);
@@ -236,7 +236,7 @@ fn open_trig_endstop() {
 
 #[test]
 fn close_full_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 100;
     seq.current_state.tilt = -90;
     seq.set_position(0);
@@ -310,7 +310,7 @@ fn close_full_sequence() {
 
 #[test]
 fn close_full_tiltless_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 100;
     seq.current_state.tilt = 90;
     seq.set_position(0);
@@ -344,7 +344,7 @@ fn close_full_tiltless_sequence() {
 
 #[test]
 fn close_partial_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 75;
     seq.current_state.tilt = -90;
     seq.set_position(25);
@@ -419,7 +419,7 @@ fn close_partial_sequence() {
 
 #[test]
 fn close_partial_tiltless_sequence() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 75;
     seq.current_state.tilt = 90;
     seq.set_position(25);
@@ -453,7 +453,7 @@ fn close_partial_tiltless_sequence() {
 
 #[test]
 fn close_trig_endstop() {
-    let mut seq = WindowDressingSequencer::new_venetian(100_000, 180_0);
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.position = 100;
     seq.current_state.tilt = -90;
     seq.set_position(0);

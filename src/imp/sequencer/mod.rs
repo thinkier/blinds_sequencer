@@ -1,4 +1,7 @@
-use crate::{Direction, WindowDressingInstruction, WindowDressingSequencer, WindowDressingState};
+use crate::{
+    Direction, HaltingSequencer, WindowDressingInstruction, WindowDressingSequencer,
+    WindowDressingState,
+};
 use core::cmp::Ordering;
 use core::ops::AddAssign;
 
@@ -7,7 +10,7 @@ mod tests;
 
 const HOLD_QUANTITY: u32 = 500;
 
-impl WindowDressingSequencer {
+impl HaltingSequencer {
     pub fn new_roller(full_cycle_quantity: u32) -> Self {
         Self {
             full_cycle_quantity,
@@ -21,109 +24,6 @@ impl WindowDressingSequencer {
             full_tilt_quantity: Some(full_tilt_quantity),
             ..Default::default()
         }
-    }
-
-    /// Retrieve the next instruction to send to the hardware, if present.
-    pub fn get_next_instruction(&mut self) -> Option<WindowDressingInstruction> {
-        if let Some(next) = self.instructions.pop_front() {
-            self.current_state = next.completed_state;
-
-            // If the instructions queue is empty & it's not commanded to hold, buffer a hold command
-            if self.instructions.is_empty() && next.quality != Direction::Hold {
-                self.instructions
-                    .push_back(WindowDressingInstruction {
-                        quality: Direction::Hold,
-                        quantity: HOLD_QUANTITY,
-                        completed_state: self.current_state,
-                    })
-                    .expect("The buffer should've been emptied if the hold is queued at the end");
-            }
-
-            Some(next)
-        } else {
-            None
-        }
-    }
-
-    /// Groups multiple instructions of a similar quality into a single instruction.
-    pub fn get_next_instruction_grouped(&mut self) -> Option<WindowDressingInstruction> {
-        if let Some(mut buf) = self.get_next_instruction() {
-            while let Some(next) = self.get_next_instruction() {
-                if buf.quality == next.quality {
-                    buf += &next;
-                } else {
-                    let _ = self.instructions.push_front(next);
-                    break;
-                }
-            }
-
-            Some(buf)
-        } else {
-            None
-        }
-    }
-
-    /// Command from HAP to set the position of the window dressing.
-    pub fn set_position(&mut self, opened: u8) {
-        self.desired_state.position = opened;
-        let tail = self.instructions.pop_back();
-        self.instructions.clear();
-        let absolute_change = (opened as i8 - self.current_state.position as i8).abs();
-        if absolute_change == 0 {
-            return;
-        }
-
-        let opening = opened > self.current_state.position;
-        let quality = if opening {
-            Direction::Retract
-        } else {
-            Direction::Extend
-        };
-
-        // Program a pause to prevent directly ramming the system in reverse
-        if let Some(tail) = tail {
-            if tail.quality != quality {
-                self.instructions
-                    .push_back(WindowDressingInstruction {
-                        quality: Direction::Hold,
-                        quantity: HOLD_QUANTITY,
-                        completed_state: self.current_state,
-                    })
-                    .expect("The buffer should be emptied immediately after a set_position");
-            }
-        }
-
-        let mut angle_while_moving = if opening { -90 } else { 90 };
-
-        self.add_tilt(self.current_state.tilt, angle_while_moving);
-
-        for percentage_change in 1..=absolute_change {
-            if self.full_tilt_quantity.is_none() {
-                angle_while_moving = 0;
-            }
-
-            let mut relative_change = percentage_change as i8;
-            if !opening {
-                relative_change *= -1;
-            }
-
-            let position = (self.current_state.position as i8 + relative_change) as u8;
-            // It's safe to eat the error because the state will not be corrupted
-            let _ = self.instructions.push_back(WindowDressingInstruction {
-                quality,
-                quantity: self.full_cycle_quantity / 100,
-                completed_state: WindowDressingState {
-                    position,
-                    tilt: angle_while_moving,
-                },
-            });
-        }
-        self.add_tilt(angle_while_moving, self.current_state.tilt);
-    }
-
-    /// Command from HAP to set the tilt of the window dressing.
-    pub fn set_tilt(&mut self, angle: i8) {
-        self.add_tilt(self.get_tail_state().tilt, angle);
     }
 
     /// Get the desired state of the window dressing, as defined by the last command.
@@ -191,9 +91,114 @@ impl WindowDressingSequencer {
             }
         }
     }
+}
+
+impl WindowDressingSequencer for HaltingSequencer {
+    /// Retrieve the next instruction to send to the hardware, if present.
+    fn get_next_instruction(&mut self) -> Option<WindowDressingInstruction> {
+        if let Some(next) = self.instructions.pop_front() {
+            self.current_state = next.completed_state;
+
+            // If the instructions queue is empty & it's not commanded to hold, buffer a hold command
+            if self.instructions.is_empty() && next.quality != Direction::Hold {
+                self.instructions
+                    .push_back(WindowDressingInstruction {
+                        quality: Direction::Hold,
+                        quantity: HOLD_QUANTITY,
+                        completed_state: self.current_state,
+                    })
+                    .expect("The buffer should've been emptied if the hold is queued at the end");
+            }
+
+            Some(next)
+        } else {
+            None
+        }
+    }
+
+    /// Groups multiple instructions of a similar quality into a single instruction.
+    fn get_next_instruction_grouped(&mut self) -> Option<WindowDressingInstruction> {
+        if let Some(mut buf) = self.get_next_instruction() {
+            while let Some(next) = self.get_next_instruction() {
+                if buf.quality == next.quality {
+                    buf += &next;
+                } else {
+                    let _ = self.instructions.push_front(next);
+                    break;
+                }
+            }
+
+            Some(buf)
+        } else {
+            None
+        }
+    }
+
+    /// Command from HAP to set the position of the window dressing.
+    fn set_position(&mut self, opened: u8) {
+        self.desired_state.position = opened;
+        let tail = self.instructions.pop_back();
+        self.instructions.clear();
+        let absolute_change = (opened as i8 - self.current_state.position as i8).abs();
+        if absolute_change == 0 {
+            return;
+        }
+
+        let opening = opened > self.current_state.position;
+        let quality = if opening {
+            Direction::Retract
+        } else {
+            Direction::Extend
+        };
+
+        // Program a pause to prevent directly ramming the system in reverse
+        if let Some(tail) = tail {
+            if tail.quality != quality {
+                self.instructions
+                    .push_back(WindowDressingInstruction {
+                        quality: Direction::Hold,
+                        quantity: HOLD_QUANTITY,
+                        completed_state: self.current_state,
+                    })
+                    .expect("The buffer should be emptied immediately after a set_position");
+            }
+        }
+
+        let mut angle_while_moving = if opening { -90 } else { 90 };
+
+        self.add_tilt(self.current_state.tilt, angle_while_moving);
+
+        for percentage_change in 1..=absolute_change {
+            if self.full_tilt_quantity.is_none() {
+                angle_while_moving = 0;
+            }
+
+            let mut relative_change = percentage_change as i8;
+            if !opening {
+                relative_change *= -1;
+            }
+
+            let position = (self.current_state.position as i8 + relative_change) as u8;
+            // It's safe to eat the error because the state will not be corrupted
+            let _ = self.instructions.push_back(WindowDressingInstruction {
+                quality,
+                quantity: self.full_cycle_quantity / 100,
+                completed_state: WindowDressingState {
+                    position,
+                    tilt: angle_while_moving,
+                },
+            });
+        }
+        self.add_tilt(angle_while_moving, self.current_state.tilt);
+    }
+
+    /// Command from HAP to set the tilt of the window dressing.
+    fn set_tilt(&mut self, angle: i8) {
+        self.add_tilt(self.get_tail_state().tilt, angle);
+    }
 
     /// Feedback from hardware that the endstop has been triggered.
-    pub fn trig_endstop(&mut self) {
+    fn trig_endstop(&mut self) {
         self.instructions.clear();
 
         let opening = if self.current_state.position == self.desired_state.position {
