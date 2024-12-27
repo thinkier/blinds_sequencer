@@ -1,4 +1,4 @@
-use alloc::collections::VecDeque;
+use heapless::Deque;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Direction {
@@ -14,13 +14,13 @@ pub struct WindowDressingInstruction {
     pub completed_state: WindowDressingState,
 }
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default)]
 pub struct WindowDressingSequencer {
     pub full_cycle_quality: u32,
     pub full_tilt_quality: Option<u32>,
     pub desired_state: WindowDressingState,
     pub current_state: WindowDressingState,
-    pub instructions: VecDeque<WindowDressingInstruction>,
+    pub instructions: Deque<WindowDressingInstruction, 1024>,
 }
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]

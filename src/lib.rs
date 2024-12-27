@@ -1,5 +1,5 @@
 #![no_std]
-extern crate alloc;
+extern crate heapless;
 
 mod imp;
 mod model;

@@ -34,7 +34,7 @@ impl WindowDressingSequencer {
                     quality: Direction::Hold,
                     quantity: HOLD_QUANTITY,
                     completed_state: self.current_state,
-                });
+                }).expect("The buffer should've been emptied if the hold is queued at the end");
             }
 
             Some(next)
@@ -71,7 +71,8 @@ impl WindowDressingSequencer {
             }
 
             let position = (self.current_state.position as i8 + relative_change) as u8;
-            self.instructions.push_back(WindowDressingInstruction {
+            // It's safe to eat the error because the state will not be corrupted
+            let _ = self.instructions.push_back(WindowDressingInstruction {
                 quality,
                 quantity: self.full_cycle_quality / 100,
                 completed_state: WindowDressingState {
@@ -113,7 +114,8 @@ impl WindowDressingSequencer {
             };
 
             if position == 100 {
-                self.instructions.push_back(WindowDressingInstruction {
+                // It's safe to eat the error because the state will not be corrupted
+                let _ = self.instructions.push_back(WindowDressingInstruction {
                     quality,
                     quantity: 0,
                     completed_state: WindowDressingState {
@@ -131,7 +133,8 @@ impl WindowDressingSequencer {
                     from_angle as i16 + angle_change
                 } as i8;
 
-                self.instructions.push_back(WindowDressingInstruction {
+                // It's safe to eat the error because the state will not be corrupted
+                let _ = self.instructions.push_back(WindowDressingInstruction {
                     quality,
                     quantity: full_tilt_quality / 180,
                     completed_state: WindowDressingState { position, tilt },
@@ -166,11 +169,14 @@ impl WindowDressingSequencer {
 
         self.current_state = end_state;
         self.desired_state = end_state;
-        self.instructions.push_back(WindowDressingInstruction {
-            quality: Direction::Hold,
-            quantity: HOLD_QUANTITY,
-            completed_state: end_state,
-        });
+        let _ = self
+            .instructions
+            .push_back(WindowDressingInstruction {
+                quality: Direction::Hold,
+                quantity: HOLD_QUANTITY,
+                completed_state: end_state,
+            })
+            .expect("Endstop should've cleared the instructions queue");
     }
 }
 
