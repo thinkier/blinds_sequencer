@@ -39,13 +39,11 @@ fn open_full_sequence() {
     }
 
     // Blinds should teleport back to previous tilt when fully opened
-    assert_eq!(seq.get_next_instruction().unwrap().completed_state.tilt, 90);
-
     assert_eq!(
         seq.get_next_instruction(),
         Some(WindowDressingInstruction {
             quality: Direction::Hold,
-            quantity: 500,
+            quantity: 0,
             completed_state: WindowDressingState {
                 position: 100,
                 tilt: 90
@@ -247,7 +245,7 @@ fn close_full_sequence() {
     assert_eq!(
         seq.get_next_instruction(),
         Some(WindowDressingInstruction {
-            quality: Direction::Extend,
+            quality: Direction::Hold,
             quantity: 0,
             completed_state: WindowDressingState {
                 position: 100,
@@ -464,7 +462,7 @@ fn close_trig_endstop() {
     assert_eq!(
         seq.get_next_instruction(),
         Some(WindowDressingInstruction {
-            quality: Direction::Extend,
+            quality: Direction::Hold,
             quantity: 0,
             completed_state: WindowDressingState {
                 position: 100,

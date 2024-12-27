@@ -48,6 +48,7 @@ impl WindowDressingSequencer {
     /// Command from HAP to set the position of the window dressing.
     pub fn set_position(&mut self, opened: u8) {
         self.desired_state.position = opened;
+        let tail = self.instructions.pop_back();
         self.instructions.clear();
         let absolute_change = (opened as i8 - self.current_state.position as i8).abs();
         if absolute_change == 0 {
@@ -55,20 +56,36 @@ impl WindowDressingSequencer {
         }
 
         let opening = opened > self.current_state.position;
+        let quality = if opening {
+            Direction::Retract
+        } else {
+            Direction::Extend
+        };
+
+        // Program a pause to prevent directly ramming the system in reverse
+        if let Some(tail) = tail {
+            if tail.quality != quality {
+                self.instructions
+                    .push_back(WindowDressingInstruction {
+                        quality: Direction::Hold,
+                        quantity: HOLD_QUANTITY,
+                        completed_state: self.current_state,
+                    })
+                    .expect("The buffer should be emptied immediately after a set_position");
+            }
+        }
+
         let mut angle_while_moving = if opening { -90 } else { 90 };
 
         self.add_tilt(self.current_state.tilt, angle_while_moving);
+
         for percentage_change in 1..=absolute_change {
             if self.full_tilt_quantity.is_none() {
                 angle_while_moving = 0;
             }
 
-            let quality;
             let mut relative_change = percentage_change as i8;
-            if opening {
-                quality = Direction::Retract;
-            } else {
-                quality = Direction::Extend;
+            if !opening {
                 relative_change *= -1;
             }
 
@@ -119,7 +136,7 @@ impl WindowDressingSequencer {
             if position == 100 {
                 // It's safe to eat the error because the state will not be corrupted
                 let _ = self.instructions.push_back(WindowDressingInstruction {
-                    quality,
+                    quality: Direction::Hold,
                     quantity: 0,
                     completed_state: WindowDressingState {
                         position,
