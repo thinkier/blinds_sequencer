@@ -1,5 +1,18 @@
+#[cfg(test)]
+mod tests;
+
 use crate::{Direction, FixedFrequencyStepperModulator, WindowDressingSequencer};
 use core::time::Duration;
+
+impl<S: WindowDressingSequencer> FixedFrequencyStepperModulator<S> {
+    pub fn new(period: Duration, sequencer: S) -> Self {
+        Self {
+            period,
+            sequencer,
+            cur_instruction: None,
+        }
+    }
+}
 
 impl<S: WindowDressingSequencer> Iterator for FixedFrequencyStepperModulator<S> {
     type Item = (Direction, Duration);
