@@ -1,6 +1,4 @@
-use crate::model::sequencer::{
-    WindowDressingInstruction, HaltingSequencer, WindowDressingState,
-};
+use crate::model::sequencer::{HaltingSequencer, WindowDressingInstruction, WindowDressingState};
 use crate::{Direction, WindowDressingSequencer};
 
 #[test]
