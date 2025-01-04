@@ -1,6 +1,7 @@
 use heapless::Deque;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub enum Direction {
     Extend,
     Retract,
@@ -24,14 +25,14 @@ pub trait WindowDressingSequencer {
     fn trig_endstop(&mut self);
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub struct WindowDressingInstruction {
     pub quality: Direction,
     pub quantity: u32,
     pub(crate) completed_state: WindowDressingState,
 }
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Deserialize, Serialize)]
 pub struct WindowDressingState {
     pub position: u8,
     pub tilt: i8,
