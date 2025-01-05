@@ -11,6 +11,14 @@ mod tests;
 const HOLD_QUANTITY: u32 = 500;
 
 impl HaltingSequencer {
+    pub fn new(full_cycle_quantity: u32, full_tilt_quantity: Option<u32>) -> Self {
+        Self {
+            full_cycle_quantity,
+            full_tilt_quantity,
+            ..Default::default()
+        }
+    }
+
     pub fn new_roller(full_cycle_quantity: u32) -> Self {
         Self {
             full_cycle_quantity,
