@@ -32,6 +32,14 @@ fn current_state_updates() {
 }
 
 #[test]
+fn noop_on_same_position() {
+    let mut seq = HaltingSequencer::new_roller(100_000);
+    seq.current_state.position = 69;
+    seq.set_position(69);
+    assert_eq!(seq.get_next_instruction(), None);
+}
+
+#[test]
 fn open_fully() {
     let mut seq = HaltingSequencer::new_roller(100_000);
     seq.current_state.position = 0;

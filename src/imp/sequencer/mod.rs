@@ -134,6 +134,12 @@ impl WindowDressingSequencer for HaltingSequencer {
         }
     }
 
+    /// Command from HAP to set both the position and tilt of the window dressing
+    fn set_state(&mut self, state: WindowDressingState) {
+        self.set_position(state.position);
+        self.set_tilt(state.tilt);
+    }
+
     /// Command from HAP to set the position of the window dressing.
     fn set_position(&mut self, opened: u8) {
         self.desired_state.position = opened;

@@ -20,6 +20,14 @@ fn current_state_updates() {
 }
 
 #[test]
+fn noop_on_same_tilt() {
+    let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
+    seq.current_state.tilt = 69;
+    seq.set_tilt(69);
+    assert_eq!(seq.get_next_instruction(), None);
+}
+
+#[test]
 fn close_full() {
     let mut seq = HaltingSequencer::new_venetian(100_000, 180_0);
     seq.current_state.tilt = -90;
