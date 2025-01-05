@@ -1,6 +1,6 @@
 use crate::{
-    Direction, HaltingSequencer, WindowDressingInstruction, WindowDressingSequencer,
-    WindowDressingState,
+    Direction, HaltingSequencer, SensingWindowDressingSequencer, WindowDressingInstruction,
+    WindowDressingSequencer, WindowDressingState,
 };
 use core::cmp::Ordering;
 use core::ops::AddAssign;
@@ -196,7 +196,9 @@ impl WindowDressingSequencer for HaltingSequencer {
     fn set_tilt(&mut self, angle: i8) {
         self.add_tilt(self.get_tail_state().tilt, angle);
     }
+}
 
+impl SensingWindowDressingSequencer for HaltingSequencer {
     /// Feedback from hardware that the endstop has been triggered.
     fn trig_endstop(&mut self) {
         self.instructions.clear();
@@ -232,12 +234,40 @@ impl WindowDressingSequencer for HaltingSequencer {
             })
             .expect("Endstop should've cleared the instructions queue");
     }
+
+    fn home_fully_opened(&mut self) {
+        self.current_state = WindowDressingState::closed();
+        self.desired_state = WindowDressingState::closed();
+        self.set_position(WindowDressingState::opened().position);
+    }
+
+    fn home_fully_closed(&mut self) {
+        self.current_state = WindowDressingState::opened();
+        self.desired_state = WindowDressingState::opened();
+        self.set_position(WindowDressingState::closed().position);
+    }
 }
 
 impl PartialOrd for WindowDressingState {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
+    }
+}
+
+impl WindowDressingState {
+    pub const fn closed() -> Self {
+        Self {
+            position: 0,
+            tilt: 90,
+        }
+    }
+
+    pub const fn opened() -> Self {
+        Self {
+            position: 100,
+            tilt: 0,
+        }
     }
 }
 

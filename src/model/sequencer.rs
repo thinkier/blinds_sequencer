@@ -22,7 +22,12 @@ pub trait WindowDressingSequencer {
     fn get_next_instruction_grouped(&mut self) -> Option<WindowDressingInstruction>;
     fn set_position(&mut self, position: u8);
     fn set_tilt(&mut self, tilt: i8);
+}
+
+pub trait SensingWindowDressingSequencer: WindowDressingSequencer {
     fn trig_endstop(&mut self);
+    fn home_fully_opened(&mut self);
+    fn home_fully_closed(&mut self);
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
