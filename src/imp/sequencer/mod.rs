@@ -142,6 +142,19 @@ impl WindowDressingSequencer for HaltingSequencer {
         }
     }
 
+    fn get_current_state(&self) -> &WindowDressingState {
+        &self.current_state
+    }
+
+    fn get_desired_state(&self) -> &WindowDressingState {
+        &self.desired_state
+    }
+
+    fn load_state(&mut self, state: &WindowDressingState) {
+        self.current_state = *state;
+        self.desired_state = *state;
+    }
+
     /// Command from HAP to set both the position and tilt of the window dressing
     fn set_state(&mut self, state: &WindowDressingState) {
         self.set_position(state.position);
