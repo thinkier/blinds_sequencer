@@ -8,6 +8,16 @@ pub enum Direction {
     Hold,
 }
 
+impl Direction {
+    pub fn reverse(self) -> Self {
+        match self {
+            Direction::Extend => Direction::Retract,
+            Direction::Retract => Direction::Extend,
+            Direction::Hold => Direction::Hold,
+        }
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct HaltingSequencer {
     pub(crate) full_cycle_quantity: u32,
