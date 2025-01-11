@@ -10,7 +10,7 @@ mod tests;
 
 const HOLD_QUANTITY: u32 = 500;
 
-impl HaltingSequencer {
+impl<const N: usize> HaltingSequencer<N> {
     pub fn new(full_cycle_quantity: u32, full_tilt_quantity: Option<u32>) -> Self {
         Self {
             full_cycle_quantity,
@@ -101,7 +101,7 @@ impl HaltingSequencer {
     }
 }
 
-impl WindowDressingSequencer for HaltingSequencer {
+impl<const N: usize> WindowDressingSequencer for HaltingSequencer<N> {
     /// Retrieve the next instruction to send to the hardware, if present.
     fn get_next_instruction(&mut self) -> Option<WindowDressingInstruction> {
         if let Some(next) = self.instructions.pop_front() {
@@ -225,7 +225,7 @@ impl WindowDressingSequencer for HaltingSequencer {
     }
 }
 
-impl SensingWindowDressingSequencer for HaltingSequencer {
+impl<const N: usize> SensingWindowDressingSequencer for HaltingSequencer<N> {
     /// Feedback from hardware that the endstop has been triggered.
     fn trig_endstop(&mut self) {
         self.instructions.clear();

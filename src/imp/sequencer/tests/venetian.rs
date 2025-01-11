@@ -1,5 +1,6 @@
-use crate::model::sequencer::{HaltingSequencer, WindowDressingInstruction, WindowDressingState};
+use crate::model::sequencer::{WindowDressingInstruction, WindowDressingState};
 use crate::{Direction, SensingWindowDressingSequencer, WindowDressingSequencer};
+type HaltingSequencer = crate::model::sequencer::HaltingSequencer<1024>;
 
 #[test]
 fn open_full_sequence() {

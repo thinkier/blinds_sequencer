@@ -19,12 +19,12 @@ impl Direction {
 }
 
 #[derive(Debug, Default)]
-pub struct HaltingSequencer {
+pub struct HaltingSequencer<const N: usize> {
     pub(crate) full_cycle_quantity: u32,
     pub(crate) full_tilt_quantity: Option<u32>,
     pub(crate) desired_state: WindowDressingState,
     pub(crate) current_state: WindowDressingState,
-    pub(crate) instructions: Deque<WindowDressingInstruction, 1024>,
+    pub(crate) instructions: Deque<WindowDressingInstruction, N>,
 }
 
 pub trait WindowDressingSequencer {

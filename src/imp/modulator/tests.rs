@@ -1,5 +1,6 @@
-use crate::{Direction, FixedFrequencyStepperModulator, HaltingSequencer, WindowDressingSequencer};
+use crate::{Direction, FixedFrequencyStepperModulator, WindowDressingSequencer};
 use core::time::Duration;
+type HaltingSequencer = crate::model::sequencer::HaltingSequencer<1024>;
 
 #[test]
 fn trivial_modulation() {
