@@ -135,7 +135,7 @@ impl<const N: usize> WindowDressingSequencer for HaltingSequencer<N> {
                     break;
                 }
 
-                if buf.quantity > threshold {
+                if buf.quantity >= threshold {
                     break;
                 }
             }
