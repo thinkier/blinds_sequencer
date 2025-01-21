@@ -25,7 +25,7 @@ impl<S: WindowDressingSequencer> Iterator for FixedFrequencyStepperModulator<S> 
             .unwrap_or_default();
 
         if remaining == 0 {
-            self.cur_instruction = self.sequencer.get_next_instruction_grouped();
+            self.cur_instruction = self.sequencer.get_next_instruction_grouped(u32::MAX);
         }
 
         if let Some(cur) = &mut self.cur_instruction {

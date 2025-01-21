@@ -9,7 +9,7 @@ fn close_grouped() {
     seq.set_position(0);
 
     assert_eq!(
-        seq.get_next_instruction_grouped(),
+        seq.get_next_instruction_grouped(u32::MAX),
         Some(WindowDressingInstruction {
             quality: Direction::Extend,
             quantity: 100_000,
@@ -21,7 +21,7 @@ fn close_grouped() {
     );
 
     assert_eq!(
-        seq.get_next_instruction_grouped(),
+        seq.get_next_instruction_grouped(u32::MAX),
         Some(WindowDressingInstruction {
             quality: Direction::Hold,
             quantity: 500,

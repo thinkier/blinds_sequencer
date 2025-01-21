@@ -29,7 +29,7 @@ pub struct HaltingSequencer<const N: usize> {
 
 pub trait WindowDressingSequencer {
     fn get_next_instruction(&mut self) -> Option<WindowDressingInstruction>;
-    fn get_next_instruction_grouped(&mut self) -> Option<WindowDressingInstruction>;
+    fn get_next_instruction_grouped(&mut self, threshold: u32) -> Option<WindowDressingInstruction>;
     fn get_current_state(&self) -> &WindowDressingState;
     fn get_desired_state(&self) -> &WindowDressingState;
     fn load_state(&mut self, state: &WindowDressingState);
