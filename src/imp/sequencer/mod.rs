@@ -125,7 +125,10 @@ impl<const N: usize> WindowDressingSequencer for HaltingSequencer<N> {
     }
 
     /// Groups multiple instructions of a similar quality into a single instruction.
-    fn get_next_instruction_grouped(&mut self, threshold: u32) -> Option<WindowDressingInstruction> {
+    fn get_next_instruction_grouped(
+        &mut self,
+        threshold: u32,
+    ) -> Option<WindowDressingInstruction> {
         if let Some(mut buf) = self.get_next_instruction() {
             while let Some(next) = self.get_next_instruction() {
                 if buf.quality == next.quality {
@@ -241,11 +244,7 @@ impl<const N: usize> SensingWindowDressingSequencer for HaltingSequencer<N> {
                 || self.current_state.position == 100
         };
         let tilt = if self.full_tilt_quantity.is_some() {
-            if opening {
-                0
-            } else {
-                90
-            }
+            90
         } else {
             0
         };

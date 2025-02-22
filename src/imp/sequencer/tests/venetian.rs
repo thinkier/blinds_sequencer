@@ -226,7 +226,7 @@ fn open_trig_endstop() {
             quantity: 500,
             completed_state: WindowDressingState {
                 position: 100,
-                tilt: 0
+                tilt: 90
             },
         })
     );
